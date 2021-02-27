@@ -1,31 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useChallenges } from '../contexts/ChallengesContext';
+import { useCountdown } from '../contexts/CountdownContext';
 import styles from '../styles/components/Countdown.module.css'
 
+
+
 export default function Countdown() {
-  const [time, setTime] = useState(25 * 60)
-  const [active, setActive] = useState(false)
+  const {
+    minutes, 
+    seconds, 
+    isActive, 
+    hasFineshed, 
+    startCountdown, 
+    resetCountdown
+  } = useCountdown()
+
 
   const countDownTime = useMemo(() => {
-    const minutes = Math.floor(time / 60)
-    const seconds = time % 60;
-
     const [minLeft, minRight] = String(minutes).padStart(2, '0').split('')
     const [secLeft, secRight] = String(seconds).padStart(2, '0').split('')
 
     return {minLeft, minRight, secLeft, secRight}
-  }, [time])
-
-  function handleStartCountdown() {
-    setActive(true)
-  }
-
-  useEffect(() => {
-    if(active && time > 0) {
-      setTimeout(() => {
-        setTime(time - 1)
-      }, 1000);
-    }
-  }, [active, time])
+  }, [minutes, seconds])
 
   return (
     <div>
@@ -42,9 +38,37 @@ export default function Countdown() {
       </div>
     </div>
 
-    <button type='button' className={styles.countdownButton} onClick={handleStartCountdown}>
-      Iniciar um ciclo
-    </button>
+    { hasFineshed ? (
+      <button 
+        disabled
+        className={styles.countdownButton} 
+      >
+        Ciclo encerrado
+      </button>
+    ) : (
+      <>
+      { isActive ? (
+        <button 
+          type='button' 
+          className={`${styles.countdownButton} ${styles.countdownActiveButton} `} 
+          onClick={resetCountdown}
+        >
+          Abandonar o ciclo
+        </button>
+        ) : (
+          <button 
+            type='button' 
+            className={styles.countdownButton} 
+            onClick={startCountdown}
+          >
+            Iniciar um ciclo
+          </button>
+        ) 
+      }
+      </>
+    ) }
+
+    
     </div>
   )
 }
