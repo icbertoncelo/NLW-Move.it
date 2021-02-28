@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
-
+import Cookies from 'js-cookie'
 import challenges from '../../challenges.json'
-
 interface Challenge {
   type: 'body' | 'eye';
   description: number;
@@ -21,21 +20,30 @@ interface ChallengesContextData {
 }
 
 interface ChallengesProviderProps {
-  children: ReactNode
+  children: ReactNode,
+  level: number,
+  currentExperience: number,
+  challengesCompleted: number,
 }
 
 const ChallengesContext = createContext({} as ChallengesContextData)
 
-function ChallengesProvider({children}: ChallengesProviderProps) {
-  const [level, setLevel] = useState(1)
-  const [currentExperience, setCurrentExperience] = useState(0)
-  const [challengesCompleted, setChallengesCompleted] = useState(0)
+function ChallengesProvider({ children, ...rest }: ChallengesProviderProps) {
+  const [level, setLevel] = useState(rest.level ?? 1)
+  const [currentExperience, setCurrentExperience] = useState(rest.currentExperience ?? 0)
+  const [challengesCompleted, setChallengesCompleted] = useState(rest.challengesCompleted ?? 0)
   
   const [activeChallenge, setActiveChallenge] = useState(null)
 
   useEffect(() => {
     Notification.requestPermission()
   }, [])
+
+  useEffect(() => {
+    Cookies.set('level', String(level));
+    Cookies.set('currentExperience', String(currentExperience));
+    Cookies.set('challengesCompleted', String(challengesCompleted));
+  }, [level, currentExperience, challengesCompleted])
 
   const experienceToNextLevel = useMemo(() => {
     return Math.pow((level + 1) * 4, 2)
