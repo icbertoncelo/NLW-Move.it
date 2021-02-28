@@ -75,6 +75,8 @@
 }
 
 .challengeActive footer {
+  margin-top: 2.4rem;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.6rem;
